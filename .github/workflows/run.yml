@@ -1,0 +1,23 @@
+name: Run Streamlit App
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run script
+        run: |
+          # exit code 124 means timeout (app started successfully); treat as success
+          timeout 10 streamlit run streamlit_app.py --server.headless true || [ $? -eq 124 ]
